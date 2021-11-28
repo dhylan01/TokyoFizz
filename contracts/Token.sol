@@ -28,6 +28,18 @@ abstract contract Token is ERC721PresetMinterPauserAutoId {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     */
+
+    //Enum with all possible types
+    enum types {
+        type1,
+        type2,
+        type3,
+        type4
+    }
+
+    //mapping for whilelist - should be checked by reading blockchain so no gas used ehre
+    mapping(address => bool) public whitelisted;
+
     // An address type variable is used to store ethereum accounts.
     address public owner;
 
@@ -80,8 +92,19 @@ abstract contract Token is ERC721PresetMinterPauserAutoId {
      *
      * The `view` modifier indicates that it doesn't modify the contract's
      * state, which allows us to call it without executing a transaction.
-     */
+        
     function balanceOf(address account) external view returns (uint256) {
-        return balances[account];
+    return balances[account];
+    }
+     */
+
+    function randoMintTo(address to) public virtual {
+        //put in RNG generator
+
+        //check if time is past the start date
+        if (whitelisted[to]) mint(to);
+
+        //Make sure that they only own one
+        balanceOf(to) < 1 ? mint(to) : console.log("Owner Already owns one");
     }
 }
