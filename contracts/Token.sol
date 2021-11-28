@@ -7,8 +7,16 @@ pragma solidity ^0.8.0;
 // We import this library to be able to use console.log
 import "hardhat/console.sol";
 
+//Trying to import ERC 2771 Functions for use
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+
+//Trying to import the preset contract and take functions
+import "@openzeppelin/contracts/token/ERC721/presets/ERC721PresetMinterPauserAutoId.sol";
+
 // This is the main building block for smart contracts.
-contract Token {
+abstract contract Token is ERC721PresetMinterPauserAutoId {
+    /*
+    *Taken out due to needing overide with the preset contract
     // Some string type variables to identify the token.
     string public name = "My Hardhat Token";
     string public symbol = "MHT";
@@ -16,8 +24,15 @@ contract Token {
     // The fixed amount of tokens stored in an unsigned integer type variable.
     uint256 public totalSupply = 3000;
 
+    //Minter Adress
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+
+    */
     // An address type variable is used to store ethereum accounts.
     address public owner;
+
+    // Counter for current supply
+    uint256 public currentSupply = totalSupply();
 
     // A mapping is a key/value map. Here we store each account balance.
     mapping(address => uint256) balances;
@@ -31,7 +46,7 @@ contract Token {
     constructor() {
         // The totalSupply is assigned to transaction sender, which is the account
         // that is deploying the contract.
-        balances[msg.sender] = totalSupply;
+        balances[msg.sender] = totalSupply();
         owner = msg.sender;
     }
 
