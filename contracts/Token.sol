@@ -2,7 +2,7 @@
 
 // Solidity files have to start with this pragma.
 // It will be used by the Solidity compiler to validate its version.
-pragma solidity ^0.7.0;
+pragma solidity ^0.8.0;
 
 // We import this library to be able to use console.log
 import "hardhat/console.sol";
@@ -14,7 +14,7 @@ contract Token {
     string public symbol = "MHT";
 
     // The fixed amount of tokens stored in an unsigned integer type variable.
-    uint256 public totalSupply = 1000000;
+    uint256 public totalSupply = 3000;
 
     // An address type variable is used to store ethereum accounts.
     address public owner;
