@@ -29,6 +29,8 @@ abstract contract Token is ERC721PresetMinterPauserAutoId {
 
     */
 
+
+
     //Enum with all possible types
     enum types {
         type1,
@@ -48,6 +50,9 @@ abstract contract Token is ERC721PresetMinterPauserAutoId {
 
     // A mapping is a key/value map. Here we store each account balance.
     mapping(address => uint256) balances;
+
+    //URI mapping
+     mapping (uint256 => string) public tokenURI;
 
     /**
      * Contract initialization.
@@ -98,13 +103,25 @@ abstract contract Token is ERC721PresetMinterPauserAutoId {
     }
      */
 
-    function randoMintTo(address to) public virtual {
-        //put in RNG generator
+    function MintTo(address to,String uri) public virtual {
+        //check if time have passed
 
         //check if time is past the start date
-        if (whitelisted[to]) mint(to);
+        
+        if (whitelisted[to] && balanceOf(to) < 1 && block.timestamp(now) > block.timestamp(1620815400) && _tokenIdTracker < 200) {
+            mint(to);
+            
+            //problem here with array size and deleting and changing values
 
-        //Make sure that they only own one
-        balanceOf(to) < 1 ? mint(to) : console.log("Owner Already owns one");
+        }
+        el`se if (balanceOf(to) < 1 && block.timestamp(now) > block.timestamp(1639305000) &&  _tokenIdTracker < 3000) {
+            mint(to);
+
+            //problem here with array size and deleting and changing values
+
+        }
+        //Print that they only own one
+        else balanceOf(to) >= 1 ? mint(to) : console.log("Owner Already owns one");
     }
+
 }
