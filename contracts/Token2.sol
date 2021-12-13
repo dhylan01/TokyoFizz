@@ -28,7 +28,7 @@ contract CustomTokyoFizz is ERC721 {
         string memory symbol,
         string memory baseTokenURI
     } ERC721(name,symbol) {
-        _baseTokenURI = baseTokenURI;\
+        _baseTokenURI = baseTokenURI;
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 
@@ -46,25 +46,39 @@ contract CustomTokyoFizz is ERC721 {
     }
     // look at timestamps and make them accurate based on the right time for minting
     function mint() internal{
-        require(_tokenIdTracker < limit && msg.sender.balanceOf() < 1 &&block.timestamp(now) > block.timestamp(1620815400), "CustomTokyoFizz: unable to mint");
-        _mint(msg.sender, _tokenIdTracker.current);
-        _tokenIdTracker.increment;
+        require(_tokenIdTracker.current() < limit && msg.sender.balanceOf() < 1 , "CustomTokyoFizz: This address already posseses a Token");
+        require(block.timestamp(now) > block.timestamp(1620815400), "CustomTokyoFizz: Please wait until the correct time to mint");
+        _mint(msg.sender, _tokenIdTracker.current());
+        _tokenIdTracker.increment();
     }
 
     function mint(address to) public requires DEFAULT_ADMIN_ROLE {
-        require(_tokenIdTracker < limit, "CustomTokyoFizz: limit exceeded");
-        _safeMint(to, _tokenIdTracker.current);
-        _tokenIdTracker.increment;
+        require(_tokenIdTracker.current() < limit, "CustomTokyoFizz: limit exceeded");
+        _safeMint(to, _tokenIdTracker.current());
+        _tokenIdTracker.increment();
     }
 
     
     //might not need this if the first 200 are just created to be special
     function whitelistMint() internal {
-        require(block.timestamp(now) > block.timestamp(1620815400) && whitelisted[msg.sender], "CustomTokyoFizz: limit for waitList is over but please have another")
+        require(block.timestamp(now) > block.timestamp(1620815400) , "CustomTokyoFizz: Please wait until the Whitelist mint date to mint");
+        require(whitelisted[msg.sender], "CustomTokyoFizz: Please check if this adress is on the Whitelist")
         mint();
     }
     //things to add: waitlist and dates for minting w/ meta data
     function appendWhiteList( address a){
         whitelisted[a] = true;
+    }
+
+    function newAdmin(address a) requires DEFAULT_ADMIN_ROLE{
+        _setupRole(DEFAULT_ADMIN_ROLE, a);
+    }
+
+    function pause() requires DEFAULT_ADMIN_ROLE {
+        _pause();
+    }
+
+    function unpause() requires DEFAULT_ADMIN_ROLE {
+        _unpause();
     }
 }
