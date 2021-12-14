@@ -45,14 +45,15 @@ contract CustomTokyoFizz is ERC721 {
         _baseTokenURI = baseTokenURI;
     }
     // look at timestamps and make them accurate based on the right time for minting
-    function mint() internal{
+    function mint(uint 256 amount) internal payable{
         require(_tokenIdTracker.current() < limit && msg.sender.balanceOf() < 1 , "CustomTokyoFizz: This address already posseses a Token");
         require(block.timestamp(now) > block.timestamp(1620815400), "CustomTokyoFizz: Please wait until the correct time to mint");
         _mint(msg.sender, _tokenIdTracker.current());
         _tokenIdTracker.increment();
+        msg.sender.transfer(amount);
     }
 
-    function mint(address to) public requires DEFAULT_ADMIN_ROLE {
+    function mint(address to)  public requires DEFAULT_ADMIN_ROLE {
         require(_tokenIdTracker.current() < limit, "CustomTokyoFizz: limit exceeded");
         _safeMint(to, _tokenIdTracker.current());
         _tokenIdTracker.increment();
@@ -60,10 +61,11 @@ contract CustomTokyoFizz is ERC721 {
 
     
     //might not need this if the first 200 are just created to be special
-    function whitelistMint() internal {
+    function whitelistMint(uint256 amount) internal {
         require(block.timestamp(now) > block.timestamp(1620815400) , "CustomTokyoFizz: Please wait until the Whitelist mint date to mint");
         require(whitelisted[msg.sender], "CustomTokyoFizz: Please check if this adress is on the Whitelist")
         mint();
+        msg.sender.transfer(amount);
     }
     //things to add: waitlist and dates for minting w/ meta data
     function appendWhiteList( address a){
@@ -80,5 +82,9 @@ contract CustomTokyoFizz is ERC721 {
 
     function unpause() requires DEFAULT_ADMIN_ROLE {
         _unpause();
+    }
+    
+    function transferBalence(uint256 amount) public payable requires DEFAULT_ADMIN_ROLE{
+        address(this).transfer(amount*address(this).balance);
     }
 }
