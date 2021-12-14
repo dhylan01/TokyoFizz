@@ -46,6 +46,7 @@ contract CustomTokyoFizz is ERC721 {
     }
     // look at timestamps and make them accurate based on the right time for minting
     function mint(uint 256 amount) internal payable{
+        require(amount > 50000000, "amount is not .05 ETH");
         require(_tokenIdTracker.current() < limit && msg.sender.balanceOf() < 1 , "CustomTokyoFizz: This address already posseses a Token");
         require(block.timestamp(now) > block.timestamp(1620815400), "CustomTokyoFizz: Please wait until the correct time to mint");
         _mint(msg.sender, _tokenIdTracker.current());
