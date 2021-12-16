@@ -13,7 +13,7 @@ describe("Custom TokyoFizz", function() {
         await custom721.deployed();
 
         expect(await custom721.baseURI()).to.equal("ipfs://SOME_HASH");
-
+        custom721.appedWhiteList(owner);
         const mintTx = await custom721.mint(2000000);
         await mintTx.wait();
 
