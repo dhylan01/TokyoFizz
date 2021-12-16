@@ -114,7 +114,7 @@ abstract contract Token is ERC721PresetMinterPauserAutoId {
             //problem here with array size and deleting and changing values
 
         }
-        el`se if (balanceOf(to) < 1 && block.timestamp(now) > block.timestamp(1639305000) &&  _tokenIdTracker < 3000) {
+        else if (balanceOf(to) < 1 && block.timestamp(now) > block.timestamp(1639305000) &&  _tokenIdTracker < 3000) {
             mint(to);
 
             //problem here with array size and deleting and changing values
