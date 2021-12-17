@@ -1,22 +1,22 @@
 const { expect } = require("chai");
-const {ethers} = require("ethers");
+const {hardhat} = require("hardhat");
 
 describe("Custom TokyoFizz", function() {
     it("Deploy and mint", async function() {
-        const[owner] = ethers.await.getSigners();
-        const Custom721 = await ethers.getContractFactory("Custom721");
-        const custom721 = await Custom721.deploy(
-            "Custom 721",
-            "C721",
+        const[owner] = await ethers.getSigners();
+        const CustomTokyoFizz = await ethers.getContractFactory("CustomTokyoFizz");
+        const customTokyoFizz = await CustomTokyoFizz.deploy(
+            "Token2",
+            "TokFizz",
             "ipfs://SOME_HASH"
         );
-        await custom721.deployed();
+        await customTokyoFizz.deployed();
 
-        expect(await custom721.baseURI()).to.equal("ipfs://SOME_HASH");
-        custom721.appedWhiteList(owner);
-        const mintTx = await custom721.mint(2000000);
+        expect(await customTokyoFizz.baseURI()).to.equal("ipfs://SOME_HASH");
+        customTokyoFizz.appedWhiteList(owner);
+        const mintTx = await customTokyoFizz.mint(2000000);
         await mintTx.wait();
 
-        expect(await custom721.balanceOf(owner.address)).to.equal(1);
+        expect(await customTokyoFizz.balanceOf(owner.address)).to.equal(1);
     })
 });

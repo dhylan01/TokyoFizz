@@ -33,7 +33,7 @@ import "@openzeppelin/contracts/utils/Context.sol";
 
 contract CustomTokyoFizz is
     ERC721,
-    AccessControl,
+    AccessControlEnumerable,
     ERC721Enumerable,
     ERC721Pausable
 {
@@ -46,6 +46,9 @@ contract CustomTokyoFizz is
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIdTracker;
     string private _baseTokenURI;
+    string public baseURI;
+    //bytes32 public constant DEFAULT_ADMIN_ROLE = keccak256("DEFAULT_ADMIN_ROLE");
+    address public owner;
 
     //creating a new ERC 721 object here
     constructor(
@@ -56,15 +59,25 @@ contract CustomTokyoFizz is
     ) ERC721(name, symbol) {
         //ipfs hash for the collection meta data itself
         _baseTokenURI = baseTokenURI;
-        _setupRole("DEFAULT_ADMIN_ROLE", _msgSender());
+        owner = msg.sender;
+        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 
     function _baseURI() internal view virtual override returns (string memory) {
         return _baseTokenURI;
     }
 
-    function baseURI() public view returns (string memory) {
-        return baseURI;
+    /**
+     * @dev See {IERC165-supportsInterface}.
+     */
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(AccessControlEnumerable, ERC721, ERC721Enumerable)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
     }
 
     function setBaseURI(string memory baseTokenURI) public virtual {
@@ -72,20 +85,28 @@ contract CustomTokyoFizz is
         _baseTokenURI = baseTokenURI;
     }
 
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal virtual override(ERC721, ERC721Enumerable, ERC721Pausable) {
+        super._beforeTokenTransfer(from, to, tokenId);
+    }
+
     // look at timestamps and make them accurate based on the right time for minting
-    function mint(uint256 amount) public payable {
-        require(amount > 50000000, "amount is not .05 ETH");
+    function mint() public payable {
+        require(msg.value > 50000000, "amount is not .05 ETH");
         require(
-            _tokenIdTracker.current() < limit && msg.sender.balanceOf() < 1,
+            _tokenIdTracker.current() < limit && balanceOf(msg.sender) < 1,
             "CustomTokyoFizz: This address already posseses a Token"
         );
         require(
-            block.timestamp(now) > block.timestamp(1620815400),
+            block.timestamp > 1620815400,
             "CustomTokyoFizz: Please wait until the correct time to mint"
         );
         _mint(msg.sender, _tokenIdTracker.current());
         _tokenIdTracker.increment();
-        msg.sender.transfer(amount);
+        payable(owner).transfer(msg.value);
     }
 
     function mint(address to) public {
@@ -102,7 +123,7 @@ contract CustomTokyoFizz is
     function whitelistMint(uint256 amount) internal {
         require(amount > 50000000, "amount is not .05 ETH");
         require(
-            block.timestamp(now) > block.timestamp(1620815400),
+            block.timestamp > 620815400,
             "CustomTokyoFizz: Please wait until the Whitelist mint date to mint"
         );
         require(
@@ -111,7 +132,8 @@ contract CustomTokyoFizz is
         );
         _mint(msg.sender, _tokenIdTracker.current());
         _tokenIdTracker.increment();
-        msg.sender.transfer(amount);
+        payable(owner).transfer(msg.value);
+        //msg.sender.transfer(amount);
     }
 
     //things to add: waitlist and dates for minting w/ meta data
@@ -134,8 +156,8 @@ contract CustomTokyoFizz is
         _unpause();
     }
 
-    function transferBalence(uint256 amount) public payable {
+    function transferBalence() public payable {
         require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender));
-        address(this).transfer(amount * address(this).balance);
+        payable(msg.sender).transfer(address(this).balance);
     }
 }
