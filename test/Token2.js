@@ -12,9 +12,9 @@ describe("Custom TokyoFizz", function() {
         );
         await customTokyoFizz.deployed();
 
-        expect(await customTokyoFizz.baseURI()).to.equal("ipfs://SOME_HASH");
-        customTokyoFizz.appedWhiteList(owner);
-        const mintTx = await customTokyoFizz.mint(2000000);
+        expect(await customTokyoFizz._baseURI()).to.equal("ipfs://SOME_HASH");
+        customTokyoFizz.appedWhiteList(owner[0]);
+        const mintTx = await customTokyoFizz.mint();
         await mintTx.wait();
 
         expect(await customTokyoFizz.balanceOf(owner.address)).to.equal(1);
