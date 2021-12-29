@@ -19,9 +19,13 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  const Token = await ethers.getContractFactory("Token");
-  const token = await Token.deploy();
+  const Token = await ethers.getContractFactory("CustomTokyoFizz");
+  const token = await Token.deploy(    
+    "Token2",
+  "TokFizz",
+  "ipfs://SOME_HASH");
   await token.deployed();
+
 
   console.log("Token address:", token.address);
 
@@ -42,7 +46,7 @@ function saveFrontendFiles(token) {
     JSON.stringify({ Token: token.address }, undefined, 2)
   );
 
-  const TokenArtifact = artifacts.readArtifactSync("Token");
+  const TokenArtifact = artifacts.readArtifactSync("CustomTokyoFizz");
 
   fs.writeFileSync(
     contractsDir + "/Token.json",

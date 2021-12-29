@@ -40,13 +40,12 @@ contract CustomTokyoFizz is
     uint256 constant limit = 3000;
     //uint256 const waitlistLimit = 200;
     //mapping for whilelist - should be checked by reading blockchain so no gas used ehre
-    mapping(address => bool) public whitelisted;
+    mapping(address => bool) public whitelist;
 
     //every time someone mints we incriment this to reflect the current token we are on for minting
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIdTracker;
     string private _baseTokenURI;
-    string public baseURI;
     //bytes32 public constant DEFAULT_ADMIN_ROLE = keccak256("DEFAULT_ADMIN_ROLE");
     address public owner;
 
@@ -64,6 +63,10 @@ contract CustomTokyoFizz is
     }
 
     function _baseURI() internal view virtual override returns (string memory) {
+        return _baseTokenURI;
+    }
+
+    function baseURI() public view returns (string memory) {
         return _baseTokenURI;
     }
 
@@ -95,9 +98,9 @@ contract CustomTokyoFizz is
 
     // look at timestamps and make them accurate based on the right time for minting
     function mint() public payable {
-        require(msg.value > 50000000, "amount is not .05 ETH");
+        require(msg.value >= 50000000000000000, "amount is not .05 ETH");
         require(
-            _tokenIdTracker.current() < limit && balanceOf(msg.sender) < 1,
+            _tokenIdTracker.current() < limit && balanceOf(msg.sender) < 2,
             "CustomTokyoFizz: This address already posseses a Token"
         );
         require(
@@ -109,6 +112,7 @@ contract CustomTokyoFizz is
         payable(owner).transfer(msg.value);
     }
 
+    /*
     function mint(address to) public {
         require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender));
         require(
@@ -118,16 +122,16 @@ contract CustomTokyoFizz is
         _safeMint(to, _tokenIdTracker.current());
         _tokenIdTracker.increment();
     }
-
+    */
     //might not need this if the first 200 are just created to be special
-    function whitelistMint(uint256 amount) internal {
-        require(amount > 50000000, "amount is not .05 ETH");
+    function whitelistMint() public payable {
+        require(msg.value >= 50000000000000000, "amount is not .05 ETH");
         require(
             block.timestamp > 620815400,
             "CustomTokyoFizz: Please wait until the Whitelist mint date to mint"
         );
         require(
-            whitelisted[msg.sender],
+            whitelist[msg.sender],
             "CustomTokyoFizz: Please check if this adress is on the Whitelist"
         );
         _mint(msg.sender, _tokenIdTracker.current());
@@ -137,8 +141,8 @@ contract CustomTokyoFizz is
     }
 
     //things to add: waitlist and dates for minting w/ meta data
-    function appendWhiteList(address a) public {
-        whitelisted[a] = true;
+    function appendWhitelist(address a) public {
+        whitelist[a] = true;
     }
 
     function newAdmin(address a) public {

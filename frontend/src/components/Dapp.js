@@ -230,7 +230,9 @@ export class Dapp extends React.Component {
     // When, we initialize the contract using that provider and the token's
     // artifact. You can do this same thing with your contracts.
     this._token = new ethers.Contract(
+      //contract address
       contractAddress.Token,
+      //CustomTokyoFizz.json
       TokenArtifact.abi,
       this._provider.getSigner(0)
     );

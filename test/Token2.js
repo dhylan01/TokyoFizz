@@ -11,12 +11,34 @@ describe("Custom TokyoFizz", function() {
             "ipfs://SOME_HASH"
         );
         await customTokyoFizz.deployed();
-
-        expect(await customTokyoFizz._baseURI()).to.equal("ipfs://SOME_HASH");
-        customTokyoFizz.appedWhiteList(owner[0]);
-        const mintTx = await customTokyoFizz.mint();
+        
+        //console.log("sdsfs", await customTokyoFizz.baseURI());
+        expect(await customTokyoFizz.baseURI()).to.equal("ipfs://SOME_HASH");
+        const addy = owner.address;
+        customTokyoFizz.appendWhitelist(addy);
+        await customTokyoFizz.whitelist(addy);
+        //expect(customTokyoFizz.whitelist[addy]).to.equal(true);
+        const waitTx = await customTokyoFizz.whitelistMint({value: ethers.utils.parseEther("0.05")});
+        await waitTx.wait();
+        const waitTx2 = await customTokyoFizz.whitelistMint({value: ethers.utils.parseEther("0.05")});
+        await waitTx2.wait();
+        /*
+        const mintTx = await customTokyoFizz.mint({value: ethers.utils.parseEther("0.05")});
         await mintTx.wait();
+            */
+        
+        expect(await customTokyoFizz.balanceOf(owner.address)).to.equal(2);
+        
 
-        expect(await customTokyoFizz.balanceOf(owner.address)).to.equal(1);
+        
     })
 });
+
+/*
+//deploying to hardhat and testing
+npx hardhat node
+npx hardhat run --network localhost scripts/deploy.js
+npx hardhat console --network localhost
+const CustomTokyoFizz = await ethers.getContractFactory("CustomTokyoFizz")
+const token = await CustomTokyoFizz.attach("address when deployed in console")
+*/
