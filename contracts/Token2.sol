@@ -25,6 +25,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 //node_modules\@openzeppelin/contracts/token/ERC721/presets/ERC721PresetMinterPauserAutoId.sol
 
@@ -37,6 +38,7 @@ contract CustomTokyoFizz is
     ERC721Enumerable,
     ERC721Pausable
 {
+    using Strings for uint256;
     uint256 constant limit = 3000;
     //uint256 const waitlistLimit = 200;
     //mapping for whilelist - should be checked by reading blockchain so no gas used ehre
@@ -68,6 +70,31 @@ contract CustomTokyoFizz is
 
     function baseURI() public view returns (string memory) {
         return _baseTokenURI;
+    }
+
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        virtual
+        override
+        returns (string memory)
+    {
+        require(
+            _exists(tokenId),
+            "ERC721Metadata: URI query for nonexistent token"
+        );
+
+        string memory currentBaseURI = _baseURI();
+        return
+            bytes(currentBaseURI).length > 0
+                ? string(
+                    abi.encodePacked(
+                        currentBaseURI,
+                        tokenId.toString(),
+                        ".json"
+                    )
+                )
+                : "";
     }
 
     /**

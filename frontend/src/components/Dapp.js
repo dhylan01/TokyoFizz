@@ -14,10 +14,11 @@ import contractAddress from "../contracts/contract-address.json";
 import { NoWalletDetected } from "./NoWalletDetected";
 import { ConnectWallet } from "./ConnectWallet";
 import { Loading } from "./Loading";
-import { Transfer } from "./Transfer";
+//import { Transfer } from "./Transfer";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
 import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
 import { NoTokensMessage } from "./NoTokensMessage";
+import { Mint } from "./Mint";
 
 // This is the Hardhat Network id, you might change it in the hardhat.config.js
 // Here's a list of network ids https://docs.metamask.io/guide/ethereum-provider.html#properties
@@ -30,8 +31,8 @@ const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
 // This component is in charge of doing these things:
 //   1. It connects to the user's wallet
 //   2. Initializes ethers and the Token contract
-//   3. Polls the user balance to keep it updated.
-//   4. Transfers tokens by sending transactions
+//   3. Polls the user balance to keep it updated. --> want this to just take the balence or id from contract
+//   4. Transfers tokens by sending transactions - dont want 
 //   5. Renders the whole application
 //
 // Note that (3) and (4) are specific of this sample application, but they show
@@ -50,8 +51,8 @@ export class Dapp extends React.Component {
       selectedAddress: undefined,
       balance: undefined,
       // The ID about transactions being sent, and any possible error with them
-      txBeingSent: undefined,
-      transactionError: undefined,
+      //txBeingSent: undefined,
+      //transactionError: undefined,
       networkError: undefined,
     };
 
@@ -108,55 +109,19 @@ export class Dapp extends React.Component {
 
         <hr />
 
+
+
+            
         <div className="row">
-          <div className="col-12">
-            {/* 
-              Sending a transaction isn't an immidiate action. You have to wait
-              for it to be mined.
-              If we are waiting for one, we show a message here.
-            */}
-            {this.state.txBeingSent && (
-              <WaitingForTransactionMessage txHash={this.state.txBeingSent} />
-            )}
-
-            {/* 
-              Sending a transaction can fail in multiple ways. 
-              If that happened, we show a message here.
-            */}
-            {this.state.transactionError && (
-              <TransactionErrorMessage
-                message={this._getRpcErrorMessage(this.state.transactionError)}
-                dismiss={() => this._dismissTransactionError()}
-              />
-            )}
-          </div>
+        <div className="col-12">
+          {
+            //need help making the button here
+            let btn = document.createElement("button");
+          btn.innerHTML = "Save";
+          btn.addEventListener("click", Mint.Mint());
+          document.body.appendChild(btn);}
         </div>
-
-        <div className="row">
-          <div className="col-12">
-            {/*
-              If the user has no tokens, we don't show the Tranfer form
-            */}
-            {this.state.balance.eq(0) && (
-              <NoTokensMessage selectedAddress={this.state.selectedAddress} />
-            )}
-
-            {/*
-              This component displays a form that the user can use to send a 
-              transaction and transfer some tokens.
-              The component doesn't have logic, it just calls the transferTokens
-              callback.
-            */}
-            {this.state.balance.gt(0) && (
-              <Transfer
-                transferTokens={(to, amount) =>
-                  this._transferTokens(to, amount)
-                }
-                tokenSymbol={this.state.tokenData.symbol}
-              />
-            )}
-          </div>
-        </div>
+      </div>
       </div>
     );
   }

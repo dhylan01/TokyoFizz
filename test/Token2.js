@@ -8,18 +8,20 @@ describe("Custom TokyoFizz", function() {
         const customTokyoFizz = await CustomTokyoFizz.deploy(
             "Token2",
             "TokFizz",
-            "ipfs://SOME_HASH"
+            "ipfs://SOME_HASH/"
         );
         await customTokyoFizz.deployed();
         
         //console.log("sdsfs", await customTokyoFizz.baseURI());
-        expect(await customTokyoFizz.baseURI()).to.equal("ipfs://SOME_HASH");
+        expect(await customTokyoFizz.baseURI()).to.equal("ipfs://SOME_HASH/");
         const addy = owner.address;
+        
         customTokyoFizz.appendWhitelist(addy);
         await customTokyoFizz.whitelist(addy);
         //expect(customTokyoFizz.whitelist[addy]).to.equal(true);
         const waitTx = await customTokyoFizz.whitelistMint({value: ethers.utils.parseEther("0.05")});
         await waitTx.wait();
+        console.log( "fds", await customTokyoFizz.tokenURI(0));
         const waitTx2 = await customTokyoFizz.whitelistMint({value: ethers.utils.parseEther("0.05")});
         await waitTx2.wait();
         /*
