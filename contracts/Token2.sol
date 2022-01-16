@@ -38,11 +38,14 @@ contract CustomTokyoFizz is
     ERC721Enumerable,
     ERC721Pausable
 {
+    bytes32 public constant WHITELISTED_ROLE = keccak256("WHITELISTED_ROLE");
     using Strings for uint256;
-    uint256 constant limit = 3000;
+    uint256 constant limit = 2999;
+    uint8 holderLimit = 2;
+    uint256 releaseDate;
     //uint256 const waitlistLimit = 200;
     //mapping for whilelist - should be checked by reading blockchain so no gas used ehre
-    mapping(address => bool) public whitelist;
+    //mapping(address => bool) public whitelist;
 
     //every time someone mints we incriment this to reflect the current token we are on for minting
     using Counters for Counters.Counter;
@@ -60,8 +63,10 @@ contract CustomTokyoFizz is
     ) ERC721(name, symbol) {
         //ipfs hash for the collection meta data itself
         _baseTokenURI = baseTokenURI;
-        owner = msg.sender;
+        owner = _msgSender();
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+        _setupRole(WHITELISTED_ROLE, _msgSender());
+        releaseDate = block.timestamp + 7 days;
     }
 
     function _baseURI() internal view virtual override returns (string memory) {
@@ -111,7 +116,7 @@ contract CustomTokyoFizz is
     }
 
     function setBaseURI(string memory baseTokenURI) public virtual {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender));
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()));
         _baseTokenURI = baseTokenURI;
     }
 
@@ -126,22 +131,34 @@ contract CustomTokyoFizz is
     // look at timestamps and make them accurate based on the right time for minting
     function mint() public payable {
         require(msg.value >= 50000000000000000, "amount is not .05 ETH");
+        if (block.timestamp < releaseDate) {
+            require(
+                hasRole(WHITELISTED_ROLE, _msgSender()),
+                "This account is not whitelisted and cannot mint at this time"
+            );
+        }
         require(
-            _tokenIdTracker.current() < limit && balanceOf(msg.sender) < 2,
-            "CustomTokyoFizz: This address already posseses a Token"
+            _tokenIdTracker.current() < limit,
+            "CustomTokyoFizz: The amount minted is at its limit " // + Strings.toString(_tokenIdTracker.current())
         );
         require(
-            block.timestamp > 1620815400,
+            balanceOf(_msgSender()) < holderLimit,
+            "CustomTokyoFizz: This address surpassed the current limit of tokens"
+        );
+        /*
+        require(
+            block.timestamp > releaseDate,
             "CustomTokyoFizz: Please wait until the correct time to mint"
         );
-        _mint(msg.sender, _tokenIdTracker.current());
+        */
+        _mint(_msgSender(), _tokenIdTracker.current());
         _tokenIdTracker.increment();
         payable(owner).transfer(msg.value);
     }
 
     /*
     function mint(address to) public {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender));
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()));
         require(
             _tokenIdTracker.current() < limit,
             "CustomTokyoFizz: limit exceeded"
@@ -151,6 +168,7 @@ contract CustomTokyoFizz is
     }
     */
     //might not need this if the first 200 are just created to be special
+    /*
     function whitelistMint() public payable {
         require(msg.value >= 50000000000000000, "amount is not .05 ETH");
         require(
@@ -158,37 +176,43 @@ contract CustomTokyoFizz is
             "CustomTokyoFizz: Please wait until the Whitelist mint date to mint"
         );
         require(
-            whitelist[msg.sender],
+            whitelist[_msgSender()],
             "CustomTokyoFizz: Please check if this adress is on the Whitelist"
         );
-        _mint(msg.sender, _tokenIdTracker.current());
+        _mint(_msgSender(), _tokenIdTracker.current());
         _tokenIdTracker.increment();
         payable(owner).transfer(msg.value);
-        //msg.sender.transfer(amount);
+        //_msgSender().transfer(amount);
     }
 
     //things to add: waitlist and dates for minting w/ meta data
+    /*
     function appendWhitelist(address a) public {
         whitelist[a] = true;
     }
+    */
+    function addToWhiteList(address a) public {
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()));
+        _grantRole(WHITELISTED_ROLE, a);
+    }
 
     function newAdmin(address a) public {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender));
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()));
         _grantRole(DEFAULT_ADMIN_ROLE, a);
     }
 
     function pause() public {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender));
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()));
         _pause();
     }
 
     function unpause() public {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender));
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()));
         _unpause();
     }
 
-    function transferBalence() public payable {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender));
-        payable(msg.sender).transfer(address(this).balance);
+    function transferBalance() public payable {
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()));
+        payable(_msgSender()).transfer(address(this).balance);
     }
 }

@@ -33,6 +33,7 @@
     "husky": "^4.2.5"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.4.0"
+    "@openzeppelin/contracts": "^4.4.0",
+    "web3modal": "^1.9.5"
   }
 }
