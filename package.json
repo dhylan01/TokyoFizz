@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.4.0",
+    "@walletconnect/web3-provider": "^1.7.1",
     "web3modal": "^1.9.5"
   }
 }

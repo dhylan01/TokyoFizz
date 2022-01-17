@@ -9,11 +9,11 @@ export function Mint({ }) {
           // This function just calls the transferTokens callback with the
           // form's data.
           event.preventDefault();
-            /*
+          
           const formData = new FormData(event.target);
           const to = formData.get("to");
           const amount = formData.get("amount");
-            */
+          
            //maybe make a mintable if statement in contract???
           Mint();
         }}
